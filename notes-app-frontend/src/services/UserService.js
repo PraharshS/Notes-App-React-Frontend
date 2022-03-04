@@ -1,10 +1,13 @@
 import axios from "axios";
 
-const STUDENT_API_BASE_URL = "http://localhost:5000/node-api/v1";
+const USER_API_BASE_URL = "http://localhost:5000/node-api/user";
 
 class UserService {
-  createUser() {
-    return axios.post(STUDENT_API_BASE_URL + "/add");
+  createUser(user) {
+    return axios.post(USER_API_BASE_URL + "/add", { user: user });
+  }
+  loginUser(user) {
+    return axios.post(USER_API_BASE_URL + "/login", { user: user });
   }
 }
 export default new UserService();

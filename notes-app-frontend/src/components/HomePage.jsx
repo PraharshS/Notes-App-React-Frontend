@@ -1,6 +1,10 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 export default class HomePage extends Component {
+  constructor(props) {
+    super(props);
+    console.log("Homepage", props);
+  }
   render() {
     return (
       <div style={homePageStyle.div}>

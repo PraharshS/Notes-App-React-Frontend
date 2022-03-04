@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import Alert from "react-bootstrap/Alert";
 import UserService from "../services/UserService";
 class SignupPage extends Component {
   constructor(props) {
@@ -8,9 +7,10 @@ class SignupPage extends Component {
       username: "Praharsh",
       password: "123456",
       confirmPassword: "123456",
-      alertMessage: "Hello",
+      alertMessage: "",
       isAlertShow: true,
       alertType: "danger",
+      redirect: null,
     };
     this.changeUsername = this.changeUsername.bind(this);
     this.changePasswordHandler = this.changePasswordHandler.bind(this);
@@ -87,13 +87,14 @@ class SignupPage extends Component {
     this.setState({ alertType: "success" });
     setTimeout(() => {
       UserService.createUser(User).then((res) => {
-        this.props.history.push("/login");
+        // console.log(res.data);
+        console.log(this.props);
+        this.setState({ redirect: "/login" });
       });
-    }, 3000);
+    }, 2000);
   };
 
   render() {
-    const { history } = this.props;
     return (
       <div>
         <div className="container" style={containerStyle.div}>
@@ -138,11 +139,7 @@ class SignupPage extends Component {
                       onChange={this.changeConfirmPasswordHandler}
                     />
                   </div>
-                  <div
-                    className="form-group"
-                    style={containerStyle.formGroup}
-                    style={loginButtonStyle.parent}
-                  >
+                  <div className="form-group" style={containerStyle.formGroup}>
                     <div
                       className="btn btn-success"
                       onClick={this.saveUser}
@@ -152,7 +149,6 @@ class SignupPage extends Component {
                     </div>
                     <div
                       className="btn btn-danger"
-                      onClick={() => history.push("/")}
                       style={loginButtonStyle.button2}
                     >
                       Cancel

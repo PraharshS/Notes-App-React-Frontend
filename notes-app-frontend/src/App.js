@@ -1,17 +1,17 @@
-import { Routes, BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Switch, Route } from "react-router-dom";
 import "./App.css";
 import HomePage from "./components/HomePage";
 import LoginPage from "./components/LoginPage";
 import SignUpPage from "./components/SignUpPage";
+import AllNotes from "./components/AllNotes";
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" exact element={<HomePage />}></Route>
-        <Route path="/login" exact element={<LoginPage />}></Route>
-        <Route path="/signup" exact element={<SignUpPage />}></Route>
-      </Routes>
-    </Router>
+    <Switch>
+      <Route path="/" exact component={HomePage}></Route>
+      <Route path="/login" exact component={LoginPage}></Route>
+      <Route path="/signup" exact component={SignUpPage}></Route>
+      <Route path="/notes" exact component={AllNotes}></Route>
+    </Switch>
   );
 }
 
