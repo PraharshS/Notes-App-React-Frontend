@@ -82,14 +82,12 @@ class SignupPage extends Component {
     }
     this.changeAlertBg();
     console.log("User => " + JSON.stringify(User));
-    this.setState({ alertMessage: "Account Created Successfully" });
+    this.setState({ alertMessage: "Account created Successfully" });
     this.setState({ isAlertShow: true });
     this.setState({ alertType: "success" });
     setTimeout(() => {
       UserService.createUser(User).then((res) => {
-        // console.log(res.data);
-        console.log(this.props);
-        this.setState({ redirect: "/login" });
+        this.props.history.push("/login");
       });
     }, 2000);
   };

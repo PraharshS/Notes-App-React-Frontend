@@ -9,16 +9,19 @@ class LoginPage extends Component {
       confirmPassword: "123456",
       alertMessage: "",
       isAlertShow: true,
-      alertType: "danger",
     };
     this.changeUsername = this.changeUsername.bind(this);
     this.changePasswordHandler = this.changePasswordHandler.bind(this);
-    this.changeAlertBg = this.changeAlertBg.bind(this);
+    this.changeAlertDanger = this.changeAlertDanger.bind(this);
+    this.changeAlertSuccess = this.changeAlertSuccess.bind(this);
   }
   changeUsername = (e) => {
     this.setState({ username: e.target.value });
   };
-  changeAlertBg = (e) => {
+  changeAlertDanger = (e) => {
+    document.querySelector(".alertMessage").style.backgroundColor = "red";
+  };
+  changeAlertSuccess = (e) => {
     document.querySelector(".alertMessage").style.backgroundColor = "green";
   };
 
@@ -32,19 +35,29 @@ class LoginPage extends Component {
       username: this.state.username,
       password: this.state.password,
     };
-    this.changeAlertBg();
+    this.changeAlertSuccess();
     console.log("User => " + JSON.stringify(User));
-    this.setState({
-      alertMessage: "Login Successfull, redirecting to your notes",
-    });
-    this.setState({ isAlertShow: true });
-    this.setState({ alertType: "success" });
+
     setTimeout(() => {
       UserService.loginUser(User).then((res) => {
-        console.log("login user by node ", res.data.user);
-        this.props.history.push("/notes", res.data);
+        console.log("data sent by node ", res.data);
+        if (res.data.user.id === 0) {
+          this.setState({ isAlertShow: true });
+          this.setState({
+            alertMessage: "Invalid credentials",
+          });
+        } else {
+          this.setState({
+            alertMessage: "Login Successful, redirecting to your notes",
+          });
+          this.setState({ isAlertShow: true });
+          this.changeAlertSuccess();
+          setTimeout(() => {
+            this.props.history.push("/notes", res.data);
+          }, 3000);
+        }
       });
-    }, 2000);
+    }, 1);
   };
 
   render() {

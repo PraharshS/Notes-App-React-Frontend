@@ -7,7 +7,7 @@ class UserService {
     return axios.post(USER_API_BASE_URL + "/add", { user: user });
   }
   loginUser(user) {
-    return axios.post(USER_API_BASE_URL + "/login", { user: user });
+    return axios.post(USER_API_BASE_URL + "/login", user);
   }
 }
 export default new UserService();
