@@ -15,6 +15,7 @@ export default class AllNotes extends Component {
     this.handleEditClick = this.handleEditClick.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
     this.handleUpdateClick = this.handleUpdateClick.bind(this);
+    this.handleLogOutClick = this.handleLogOutClick.bind(this);
   }
   componentDidMount() {
     console.log("cdm called");
@@ -83,10 +84,28 @@ export default class AllNotes extends Component {
       });
     });
   }
+  handleLogOutClick(e) {
+    this.props.history.push("/");
+    window.history.replaceState({}, document.title);
+  }
   render() {
     return (
       <div style={notesTableStyle.card}>
-        <h1 style={notesTableStyle.h1}>Your Notes</h1>
+        <div style={notesTableStyle.header}>
+          <h1 style={notesTableStyle.h1}>
+            {this.props.history.location.state &&
+              this.props.history.location.state.user.username}
+            's Notes
+          </h1>
+          <button
+            id="logoutBtn"
+            style={notesTableStyle.logoutBtn}
+            onClick={this.handleLogOutClick}
+          >
+            Logout
+          </button>
+        </div>
+
         <div style={notesTableStyle.AddNote}>
           <input
             id="noteInput"
@@ -138,12 +157,18 @@ export default class AllNotes extends Component {
   }
 }
 var notesTableStyle = {
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   card: {
     backgroundColor: "cyan",
     padding: "2rem",
     width: "600px",
   },
   h1: {
+    display: "inline-block",
     textAlign: "center",
     fontSize: "3rem",
   },
@@ -164,6 +189,15 @@ var notesTableStyle = {
     fontSize: "1.2rem",
     fontWeight: "bold",
     padding: "1rem 1.5rem",
+  },
+  logoutBtn: {
+    backgroundColor: "grey",
+    color: "white",
+    fontSize: "1.2rem",
+    fontWeight: "bold",
+    padding: "0.5rem 1rem",
+    marginLeft: "auto",
+    height: "50px",
   },
   updateBtn: {
     backgroundColor: "orange",
