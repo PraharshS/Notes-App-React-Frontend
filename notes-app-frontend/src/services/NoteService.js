@@ -6,6 +6,9 @@ class NoteService {
   getNotesByUser(user) {
     return axios.post(NOTE_API_BASE_URL + "/notes-by-user", user);
   }
+  addNote(noteObj) {
+    return axios.post(NOTE_API_BASE_URL + "/note", noteObj);
+  }
   deleteNote(noteId) {
     return axios.delete(NOTE_API_BASE_URL + "/note/" + noteId);
   }

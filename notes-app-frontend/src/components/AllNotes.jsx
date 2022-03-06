@@ -7,8 +7,11 @@ export default class AllNotes extends Component {
 
     this.state = {
       notesList: [],
+      newNoteText: "",
     };
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
+    this.handleNewNoteText = this.handleNewNoteText.bind(this);
+    this.addNote = this.addNote.bind(this);
   }
   componentDidMount() {
     console.log("cdm called");
@@ -24,17 +27,28 @@ export default class AllNotes extends Component {
       }
     );
   }
+  handleNewNoteText(e) {
+    this.setState({ newNoteText: e.target.value });
+  }
+  addNote(e) {
+    console.log(this.state.newNoteText);
+    const noteObj = {
+      message: this.state.newNoteText,
+      user: this.state.user,
+    };
+    console.log(noteObj);
+    NoteService.addNote(noteObj).then((res) => {
+      console.log("new Note created", res.data);
+      this.setState({ notesList: [...this.state.notesList, res.data] });
+    });
+  }
   handleDeleteClick(e) {
     var noteId = parseInt(e.currentTarget.getAttribute("id"));
-    console.log(noteId);
-    console.log(this.state.notesList);
     NoteService.deleteNote(noteId).then((res) => {
       this.setState({
         notesList: this.state.notesList.filter((note) => note.id !== noteId),
       });
     });
-
-    console.log(this.state.notesList);
   }
   render() {
     return (
@@ -45,8 +59,11 @@ export default class AllNotes extends Component {
             style={notesTableStyle.input}
             type="text"
             placeholder="Write a new note..."
+            onChange={this.handleNewNoteText}
           />
-          <button style={notesTableStyle.button}>Add</button>
+          <button style={notesTableStyle.button} onClick={this.addNote}>
+            Add
+          </button>
         </div>
         {this.state.notesList.map((note) => {
           return (
