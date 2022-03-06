@@ -8,13 +8,18 @@ export default class AllNotes extends Component {
     this.state = {
       notesList: [],
       newNoteText: "",
+      currentNoteId: "",
     };
-    this.handleDeleteClick = this.handleDeleteClick.bind(this);
     this.handleNewNoteText = this.handleNewNoteText.bind(this);
     this.addNote = this.addNote.bind(this);
+    this.handleEditClick = this.handleEditClick.bind(this);
+    this.handleDeleteClick = this.handleDeleteClick.bind(this);
+    this.handleUpdateClick = this.handleUpdateClick.bind(this);
   }
   componentDidMount() {
     console.log("cdm called");
+    document.querySelector("#addBtn").style.display = "block";
+    document.querySelector("#updateBtn").style.display = "none";
     if (typeof this.props.history.location.state === "undefined") {
       this.props.history.push("/unauthorized");
       return;
@@ -42,6 +47,34 @@ export default class AllNotes extends Component {
       this.setState({ notesList: [...this.state.notesList, res.data] });
     });
   }
+  handleEditClick(e) {
+    var noteId = e.currentTarget.getAttribute("id");
+    this.setState({ currentNoteId: noteId });
+    var noteMessage = e.currentTarget.getAttribute("message");
+    document.querySelector("#noteInput").value = noteMessage;
+    document.querySelector("#addBtn").style.display = "none";
+    document.querySelector("#updateBtn").style.display = "block";
+    this.setState({ newNoteText: noteMessage });
+  }
+  handleUpdateClick(e) {
+    const updatedNoteObj = {
+      message: this.state.newNoteText,
+      user: this.state.user,
+    };
+    NoteService.updateNote(this.state.currentNoteId, updatedNoteObj).then(
+      (res) => {
+        console.log("updated note", res.data);
+        NoteService.getNotesByUser(this.props.history.location.state.user).then(
+          (childRes) => {
+            this.setState({ notesList: childRes.data.notesData });
+          }
+        );
+        document.querySelector("#addBtn").style.display = "block";
+        document.querySelector("#updateBtn").style.display = "none";
+        document.querySelector("#noteInput").value = "";
+      }
+    );
+  }
   handleDeleteClick(e) {
     var noteId = parseInt(e.currentTarget.getAttribute("id"));
     NoteService.deleteNote(noteId).then((res) => {
@@ -56,21 +89,40 @@ export default class AllNotes extends Component {
         <h1 style={notesTableStyle.h1}>Your Notes</h1>
         <div style={notesTableStyle.AddNote}>
           <input
+            id="noteInput"
             style={notesTableStyle.input}
             type="text"
             placeholder="Write a new note..."
             onChange={this.handleNewNoteText}
           />
-          <button style={notesTableStyle.button} onClick={this.addNote}>
+          <button
+            id="addBtn"
+            style={notesTableStyle.addBtn}
+            onClick={this.addNote}
+          >
             Add
           </button>
+          <button
+            id="updateBtn"
+            style={notesTableStyle.updateBtn}
+            onClick={this.handleUpdateClick}
+          >
+            Update
+          </button>
         </div>
-        {this.state.notesList.map((note) => {
+        {this.state.notesList.map((note, noteSerialNumber) => {
           return (
             <div key={note.id} style={notesTableStyle.note}>
-              <p style={notesTableStyle.id}>{note.id}</p>
+              <p style={notesTableStyle.id}>{noteSerialNumber + 1}.</p>
               <p>{note.message}</p>
-              <button style={notesTableStyle.EditButton}>Edit</button>
+              <button
+                onClick={this.handleEditClick}
+                id={note.id}
+                message={note.message}
+                style={notesTableStyle.EditButton}
+              >
+                Edit
+              </button>
               <button
                 onClick={this.handleDeleteClick}
                 id={note.id}
@@ -106,8 +158,15 @@ var notesTableStyle = {
     marginRight: "1rem",
     fontWeight: "bold",
   },
-  button: {
+  addBtn: {
     backgroundColor: "teal",
+    color: "white",
+    fontSize: "1.2rem",
+    fontWeight: "bold",
+    padding: "1rem 1.5rem",
+  },
+  updateBtn: {
+    backgroundColor: "orange",
     color: "white",
     fontSize: "1.2rem",
     fontWeight: "bold",
