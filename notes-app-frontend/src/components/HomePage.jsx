@@ -61,6 +61,6 @@ var homePageStyle = {
     border: "2px solid black",
     padding: "0.5rem 2rem",
     color: "black",
-    backgroundColor: "green",
+    backgroundColor: "lightgreen",
   },
 };

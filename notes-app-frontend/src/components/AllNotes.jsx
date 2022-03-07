@@ -9,6 +9,7 @@ export default class AllNotes extends Component {
       notesList: [],
       newNoteText: "",
       currentNoteId: "",
+      popupText: "",
     };
     this.handleNewNoteText = this.handleNewNoteText.bind(this);
     this.addNote = this.addNote.bind(this);
@@ -17,8 +18,14 @@ export default class AllNotes extends Component {
     this.handleUpdateClick = this.handleUpdateClick.bind(this);
     this.handleLogOutClick = this.handleLogOutClick.bind(this);
   }
+  serverErrorPopup(errorMessage) {
+    this.setState({ popupText: "Internal Server error " + errorMessage });
+    document.querySelector(".popup").style.display = "block";
+  }
   componentDidMount() {
     console.log("cdm called");
+
+    document.querySelector("#popup").style.display = "none";
     document.querySelector("#addBtn").style.display = "block";
     document.querySelector("#updateBtn").style.display = "none";
     if (typeof this.props.history.location.state === "undefined") {
@@ -27,11 +34,13 @@ export default class AllNotes extends Component {
     }
     this.setState({ token: this.props.history.location.state.token });
     this.setState({ user: this.props.history.location.state.user });
-    NoteService.getNotesByUser(this.props.history.location.state.user).then(
-      (res) => {
+    NoteService.getNotesByUser(this.props.history.location.state.user)
+      .then((res) => {
         this.setState({ notesList: res.data.notesData });
-      }
-    );
+      })
+      .catch((err) => {
+        this.serverErrorPopup("while fetching notes...");
+      });
   }
   handleNewNoteText(e) {
     this.setState({ newNoteText: e.target.value });
@@ -43,10 +52,14 @@ export default class AllNotes extends Component {
       user: this.state.user,
     };
     console.log(noteObj);
-    NoteService.addNote(noteObj).then((res) => {
-      console.log("new Note created", res.data);
-      this.setState({ notesList: [...this.state.notesList, res.data] });
-    });
+    NoteService.addNote(noteObj)
+      .then((res) => {
+        console.log("new Note created", res.data);
+        this.setState({ notesList: [...this.state.notesList, res.data] });
+      })
+      .catch((err) => {
+        this.serverErrorPopup("while adding a note...");
+      });
   }
   handleEditClick(e) {
     var noteId = e.currentTarget.getAttribute("id");
@@ -62,8 +75,8 @@ export default class AllNotes extends Component {
       message: this.state.newNoteText,
       user: this.state.user,
     };
-    NoteService.updateNote(this.state.currentNoteId, updatedNoteObj).then(
-      (res) => {
+    NoteService.updateNote(this.state.currentNoteId, updatedNoteObj)
+      .then((res) => {
         console.log("updated note", res.data);
         NoteService.getNotesByUser(this.props.history.location.state.user).then(
           (childRes) => {
@@ -73,16 +86,22 @@ export default class AllNotes extends Component {
         document.querySelector("#addBtn").style.display = "block";
         document.querySelector("#updateBtn").style.display = "none";
         document.querySelector("#noteInput").value = "";
-      }
-    );
+      })
+      .catch((err) => {
+        this.serverErrorPopup("while updating the note...");
+      });
   }
   handleDeleteClick(e) {
     var noteId = parseInt(e.currentTarget.getAttribute("id"));
-    NoteService.deleteNote(noteId).then((res) => {
-      this.setState({
-        notesList: this.state.notesList.filter((note) => note.id !== noteId),
+    NoteService.deleteNote(noteId)
+      .then((res) => {
+        this.setState({
+          notesList: this.state.notesList.filter((note) => note.id !== noteId),
+        });
+      })
+      .catch((err) => {
+        this.serverErrorPopup("while deleting the note...");
       });
-    });
   }
   handleLogOutClick(e) {
     this.props.history.push("/");
@@ -152,6 +171,9 @@ export default class AllNotes extends Component {
             </div>
           );
         })}
+        <div className="popup" id="popup" style={notesTableStyle.popup}>
+          <h2 style={notesTableStyle.popupText}>{this.state.popupText}</h2>
+        </div>
       </div>
     );
   }
@@ -184,7 +206,7 @@ var notesTableStyle = {
     fontWeight: "bold",
   },
   addBtn: {
-    backgroundColor: "teal",
+    backgroundColor: "#4ae874",
     color: "white",
     fontSize: "1.2rem",
     fontWeight: "bold",
@@ -208,21 +230,36 @@ var notesTableStyle = {
   },
   EditButton: {
     border: "2px solid black",
+    outline: "none",
+    borderRadius: "5px",
     backgroundColor: "yellow",
     color: "black",
     fontSize: "1rem",
     fontWeight: "bold",
-    padding: "1rem 1.5rem",
+    padding: "0.5rem 1rem",
     marginLeft: "auto",
+    height: "30px",
+    marginTop: "auto",
+    marginBottom: "auto",
+    display: "inline-flex",
+    alignItems: "center",
   },
   DeleteButton: {
     border: "2px solid black",
-    backgroundColor: "red",
+    outline: "none",
+    borderRadius: "5px",
+    backgroundColor: "#ff4336",
     color: "black",
     fontSize: "1rem",
     fontWeight: "bold",
-    padding: "1rem 1.5rem",
+    padding: "0.5rem 1rem",
     marginLeft: "1rem",
+    marginRight: "1rem",
+    height: "30px",
+    marginTop: "auto",
+    marginBottom: "auto",
+    display: "inline-flex",
+    alignItems: "center",
   },
   note: {
     backgroundColor: "white",
@@ -234,5 +271,11 @@ var notesTableStyle = {
   id: {
     marginLeft: "1rem",
     marginRight: "1rem",
+  },
+  popup: {
+    backgroundColor: "orange",
+    padding: "2px",
+    textAlign: "center",
+    marginTop: "1rem",
   },
 };

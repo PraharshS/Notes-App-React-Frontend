@@ -8,21 +8,23 @@ class LoginPage extends Component {
       password: "123456",
       confirmPassword: "123456",
       alertMessage: "",
-      isAlertShow: true,
     };
     this.changeUsername = this.changeUsername.bind(this);
     this.changePasswordHandler = this.changePasswordHandler.bind(this);
     this.changeAlertDanger = this.changeAlertDanger.bind(this);
     this.changeAlertSuccess = this.changeAlertSuccess.bind(this);
   }
+  componentDidMount() {
+    document.querySelector(".popup").style.display = "none";
+  }
   changeUsername = (e) => {
     this.setState({ username: e.target.value });
   };
   changeAlertDanger = (e) => {
-    document.querySelector(".alertMessage").style.backgroundColor = "red";
+    document.querySelector(".popup").style.backgroundColor = "red";
   };
   changeAlertSuccess = (e) => {
-    document.querySelector(".alertMessage").style.backgroundColor = "green";
+    document.querySelector(".popup").style.backgroundColor = "green";
   };
 
   changePasswordHandler = (e) => {
@@ -42,11 +44,13 @@ class LoginPage extends Component {
       UserService.loginUser(User).then((res) => {
         console.log("data sent by node ", res.data);
         if (res.data.user.id === 0) {
-          this.setState({ isAlertShow: true });
+          document.querySelector(".popup").style.display = "block";
           this.setState({
             alertMessage: "Invalid credentials",
           });
+          this.changeAlertDanger();
         } else {
+          document.querySelector(".popup").style.display = "block";
           this.setState({
             alertMessage: "Login Successful, redirecting to your notes",
           });
@@ -110,15 +114,9 @@ class LoginPage extends Component {
                     </div>
                   </div>
                 </form>
-                {this.state.isAlertShow && (
-                  <div
-                    className="alertMessage"
-                    variant={this.state.alertType}
-                    style={containerStyle.alertMessage}
-                  >
-                    <p>{this.state.alertMessage}</p>
-                  </div>
-                )}
+                <div style={containerStyle.alertMessage} className="popup">
+                  <p>{this.state.alertMessage}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -172,6 +170,7 @@ var loginButtonStyle = {
     justifyContent: "center",
   },
   button1: {
+    cursor: "pointer",
     marginTop: "1.5rem",
     padding: "1rem 2rem",
     marginRight: "1rem",
@@ -183,6 +182,7 @@ var loginButtonStyle = {
     width: "30%",
   },
   button2: {
+    cursor: "pointer",
     marginTop: "1.5rem",
     padding: "1rem 2rem",
     fontSize: "1.2rem",

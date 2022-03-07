@@ -8,21 +8,25 @@ class SignupPage extends Component {
       password: "123456",
       confirmPassword: "123456",
       alertMessage: "",
-      isAlertShow: true,
-      alertType: "danger",
-      redirect: null,
     };
     this.changeUsername = this.changeUsername.bind(this);
     this.changePasswordHandler = this.changePasswordHandler.bind(this);
     this.changeConfirmPasswordHandler =
       this.changeConfirmPasswordHandler.bind(this);
-    this.changeAlertBg = this.changeAlertBg.bind(this);
+    this.changeAlertDanger = this.changeAlertDanger.bind(this);
+    this.changeAlertSuccess = this.changeAlertSuccess.bind(this);
+  }
+  componentDidMount() {
+    document.querySelector(".popup").style.display = "none";
   }
   changeUsername = (e) => {
     this.setState({ username: e.target.value });
   };
-  changeAlertBg = (e) => {
-    document.querySelector(".alertMessage").style.backgroundColor = "green";
+  changeAlertDanger = (e) => {
+    document.querySelector(".popup").style.backgroundColor = "red";
+  };
+  changeAlertSuccess = (e) => {
+    document.querySelector(".popup").style.backgroundColor = "green";
   };
 
   changePasswordHandler = (e) => {
@@ -36,8 +40,9 @@ class SignupPage extends Component {
     if (name.trim().length > 3) {
       return true;
     }
+    document.querySelector(".popup").style.display = "block";
     this.setState({ alertMessage: "Username Length must be greater than 3" });
-    this.setState({ isAlertShow: true });
+    this.changeAlertDanger();
     return false;
   }
 
@@ -45,16 +50,20 @@ class SignupPage extends Component {
     if (password.trim().length >= 6) {
       return true;
     }
+    document.querySelector(".popup").style.display = "block";
     this.setState({
       alertMessage: "Password Length must be minimum 6 characters",
     });
-    this.setState({ isAlertShow: true });
+    this.changeAlertDanger();
+
     return false;
   }
   confirmPasswordValidator(confirmpassword) {
     if (this.state.password === confirmpassword) return true;
+    document.querySelector(".popup").style.display = "block";
     this.setState({ alertMessage: "Passwords do not match" });
-    this.setState({ isAlertShow: true });
+    this.changeAlertDanger();
+
     return false;
   }
 
@@ -80,11 +89,9 @@ class SignupPage extends Component {
     if (!isConfirmPasswordValid) {
       return;
     }
-    this.changeAlertBg();
     console.log("User => " + JSON.stringify(User));
     this.setState({ alertMessage: "Account created Successfully" });
-    this.setState({ isAlertShow: true });
-    this.setState({ alertType: "success" });
+    this.changeAlertSuccess();
     setTimeout(() => {
       UserService.createUser(User).then((res) => {
         this.props.history.push("/login");
@@ -153,15 +160,9 @@ class SignupPage extends Component {
                     </div>
                   </div>
                 </form>
-                {this.state.isAlertShow && (
-                  <div
-                    className="alertMessage"
-                    variant={this.state.alertType}
-                    style={containerStyle.alertMessage}
-                  >
-                    <p>{this.state.alertMessage}</p>
-                  </div>
-                )}
+                <div className="popup" style={containerStyle.alertMessage}>
+                  <p>{this.state.alertMessage}</p>
+                </div>
               </div>
             </div>
           </div>
