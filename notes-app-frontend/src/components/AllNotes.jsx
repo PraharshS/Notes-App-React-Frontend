@@ -22,7 +22,6 @@ export default class AllNotes extends Component {
     document.querySelector(".popup").style.display = "block";
   }
   componentDidMount() {
-    console.log("cdm called");
     this.setState({ newNoteText: "" });
     document.querySelector("#popup").style.display = "none";
     // document.querySelector("#addBtn").style.display = "block";
@@ -45,10 +44,8 @@ export default class AllNotes extends Component {
     this.setState({ newNoteText: e.target.value });
   }
   addNote(e) {
-    console.log(this.state.newNoteText);
     document.querySelector("#noteInput").value = "";
     if (this.state.newNoteText.trim() === "") {
-      console.log("empty");
       this.setState({ popupText: "Cannot add an empty note" });
       this.setState({ newNoteText: "" });
       document.querySelector(".popup").style.display = "block";
@@ -61,10 +58,9 @@ export default class AllNotes extends Component {
       message: this.state.newNoteText,
       user: this.state.user,
     };
-    console.log(noteObj);
+
     NoteService.addNote(noteObj)
       .then((res) => {
-        console.log("new Note created", res.data);
         this.setState({ notesList: [...this.state.notesList, res.data] });
       })
       .catch((err) => {

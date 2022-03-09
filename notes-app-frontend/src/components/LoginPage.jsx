@@ -38,11 +38,9 @@ class LoginPage extends Component {
       password: this.state.password,
     };
     this.changeAlertSuccess();
-    console.log("User => " + JSON.stringify(User));
 
     setTimeout(() => {
       UserService.loginUser(User).then((res) => {
-        console.log("data sent by node ", res.data);
         if (res.data.user.id === 0) {
           document.querySelector(".popup").style.display = "block";
           this.setState({

@@ -9,7 +9,7 @@ export default class AllNotes extends Component {
       noteObj: this.props.history.location.state,
       alertMessage: "",
     };
-    console.log(this.state.noteObj);
+
     this.changeMessage = this.changeMessage.bind(this);
     this.updateNote = this.updateNote.bind(this);
     this.changeAlertDanger = this.changeAlertDanger.bind(this);
@@ -28,14 +28,12 @@ export default class AllNotes extends Component {
     this.setState({ noteMessage: e.target.value });
   };
   updateNote = (e) => {
-    console.log("state", this.state);
     const updatedNoteObj = {
       message: this.state.noteMessage,
       user: this.state.noteObj.user,
     };
     NoteService.updateNote(this.state.noteObj.id, updatedNoteObj)
       .then((res) => {
-        console.log("updated note", res.data);
         this.setState({
           alertMessage: "Note updated Successfully, Redirecting to All notes",
         });
@@ -62,8 +60,6 @@ export default class AllNotes extends Component {
     document.querySelector(".popup").style.display = "block";
   }
   componentDidMount() {
-    console.log("cdm called");
-
     document.querySelector(".popup").style.display = "none";
     if (typeof this.props.history.location.state === "undefined") {
       this.props.history.push("/unauthorized");
@@ -98,7 +94,6 @@ export default class AllNotes extends Component {
     };
     NoteService.updateNote(this.state.currentNoteId, updatedNoteObj)
       .then((res) => {
-        console.log("updated note", res.data);
         NoteService.getNotesByUser(this.props.history.location.state.user).then(
           (childRes) => {
             this.setState({ notesList: childRes.data.notesData });
@@ -150,18 +145,6 @@ export default class AllNotes extends Component {
                       onChange={this.changeMessage}
                     />
                   </div>
-
-                  {/* <div className="form-group" style={containerStyle.formGroup}>
-                    <label style={containerStyle.label}>Password</label>
-                    <input
-                      style={containerStyle.input}
-                      type="text"
-                      placeholder="Password"
-                      className="form-control"
-                      value={this.state.password}
-                      onChange={this.changePasswordHandler}
-                    />
-                  </div> */}
                   <div className="form-group" style={containerStyle.formGroup}>
                     <div
                       className="btn btn-success"

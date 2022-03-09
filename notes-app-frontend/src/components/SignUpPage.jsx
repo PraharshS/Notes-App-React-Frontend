@@ -89,7 +89,7 @@ class SignupPage extends Component {
     if (!isConfirmPasswordValid) {
       return;
     }
-    console.log("User => " + JSON.stringify(User));
+
     document.querySelector(".popup").style.display = "block";
     this.setState({ alertMessage: "Account created Successfully" });
     this.changeAlertSuccess();
