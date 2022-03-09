@@ -13,9 +13,8 @@ export default class AllNotes extends Component {
     };
     this.handleNewNoteText = this.handleNewNoteText.bind(this);
     this.addNote = this.addNote.bind(this);
-    this.handleEditClick = this.handleEditClick.bind(this);
+    this.openFullNote = this.openFullNote.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
-    this.handleUpdateClick = this.handleUpdateClick.bind(this);
     this.handleLogOutClick = this.handleLogOutClick.bind(this);
   }
   serverErrorPopup(errorMessage) {
@@ -26,8 +25,8 @@ export default class AllNotes extends Component {
     console.log("cdm called");
 
     document.querySelector("#popup").style.display = "none";
-    document.querySelector("#addBtn").style.display = "block";
-    document.querySelector("#updateBtn").style.display = "none";
+    // document.querySelector("#addBtn").style.display = "block";
+    // document.querySelector("#updateBtn").style.display = "none";
     if (typeof this.props.history.location.state === "undefined") {
       this.props.history.push("/unauthorized");
       return;
@@ -47,6 +46,15 @@ export default class AllNotes extends Component {
   }
   addNote(e) {
     console.log(this.state.newNoteText);
+    if (this.state.newNoteText.trim() === "") {
+      console.log("empty");
+      this.setState({ popupText: "Cannot add an empty note" });
+      document.querySelector(".popup").style.display = "block";
+      setTimeout(() => {
+        document.querySelector(".popup").style.display = "none";
+      }, 2000);
+      return;
+    }
     const noteObj = {
       message: this.state.newNoteText,
       user: this.state.user,
@@ -61,35 +69,13 @@ export default class AllNotes extends Component {
         this.serverErrorPopup("while adding a note...");
       });
   }
-  handleEditClick(e) {
-    var noteId = e.currentTarget.getAttribute("id");
-    this.setState({ currentNoteId: noteId });
-    var noteMessage = e.currentTarget.getAttribute("message");
-    document.querySelector("#noteInput").value = noteMessage;
-    document.querySelector("#addBtn").style.display = "none";
-    document.querySelector("#updateBtn").style.display = "block";
-    this.setState({ newNoteText: noteMessage });
-  }
-  handleUpdateClick(e) {
-    const updatedNoteObj = {
-      message: this.state.newNoteText,
-      user: this.state.user,
-    };
-    NoteService.updateNote(this.state.currentNoteId, updatedNoteObj)
-      .then((res) => {
-        console.log("updated note", res.data);
-        NoteService.getNotesByUser(this.props.history.location.state.user).then(
-          (childRes) => {
-            this.setState({ notesList: childRes.data.notesData });
-          }
-        );
-        document.querySelector("#addBtn").style.display = "block";
-        document.querySelector("#updateBtn").style.display = "none";
-        document.querySelector("#noteInput").value = "";
-      })
-      .catch((err) => {
-        this.serverErrorPopup("while updating the note...");
-      });
+  openFullNote(e) {
+    var id = parseInt(e.currentTarget.getAttribute("id"));
+    this.setState({ currentNoteId: id });
+    var message = e.currentTarget.getAttribute("message");
+    this.setState({ newNoteText: message });
+    var noteObj = { id, message, user: this.state.user };
+    this.props.history.push("/edit-note", noteObj);
   }
   handleDeleteClick(e) {
     var noteId = parseInt(e.currentTarget.getAttribute("id"));
@@ -140,13 +126,6 @@ export default class AllNotes extends Component {
           >
             Add
           </button>
-          <button
-            id="updateBtn"
-            style={notesTableStyle.updateBtn}
-            onClick={this.handleUpdateClick}
-          >
-            Update
-          </button>
         </div>
         {this.state.notesList.map((note, noteSerialNumber) => {
           return (
@@ -154,7 +133,7 @@ export default class AllNotes extends Component {
               <p style={notesTableStyle.id}>{noteSerialNumber + 1}.</p>
               <p>{note.message}</p>
               <button
-                onClick={this.handleEditClick}
+                onClick={this.openFullNote}
                 id={note.id}
                 message={note.message}
                 style={notesTableStyle.EditButton}
@@ -206,6 +185,7 @@ var notesTableStyle = {
     fontWeight: "bold",
   },
   addBtn: {
+    cursor: "pointer",
     backgroundColor: "#4ae874",
     color: "white",
     fontSize: "1.2rem",
@@ -213,6 +193,7 @@ var notesTableStyle = {
     padding: "1rem 1.5rem",
   },
   logoutBtn: {
+    cursor: "pointer",
     backgroundColor: "grey",
     color: "white",
     fontSize: "1.2rem",
@@ -222,6 +203,7 @@ var notesTableStyle = {
     height: "50px",
   },
   updateBtn: {
+    cursor: "pointer",
     backgroundColor: "orange",
     color: "white",
     fontSize: "1.2rem",
@@ -229,6 +211,7 @@ var notesTableStyle = {
     padding: "1rem 1.5rem",
   },
   EditButton: {
+    cursor: "pointer",
     border: "2px solid black",
     outline: "none",
     borderRadius: "5px",
@@ -238,6 +221,7 @@ var notesTableStyle = {
     fontWeight: "bold",
     padding: "0.5rem 1rem",
     marginLeft: "auto",
+    marginRight: "1rem",
     height: "30px",
     marginTop: "auto",
     marginBottom: "auto",
@@ -245,6 +229,7 @@ var notesTableStyle = {
     alignItems: "center",
   },
   DeleteButton: {
+    cursor: "pointer",
     border: "2px solid black",
     outline: "none",
     borderRadius: "5px",

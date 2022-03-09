@@ -91,7 +91,7 @@ class LoginPage extends Component {
                     <label style={containerStyle.label}>Password</label>
                     <input
                       style={containerStyle.input}
-                      type="text"
+                      type="password"
                       placeholder="Password"
                       className="form-control"
                       value={this.state.password}
@@ -109,6 +109,7 @@ class LoginPage extends Component {
                     <div
                       className="btn btn-danger"
                       style={loginButtonStyle.button2}
+                      onClick={this.props.history.goBack}
                     >
                       Cancel
                     </div>

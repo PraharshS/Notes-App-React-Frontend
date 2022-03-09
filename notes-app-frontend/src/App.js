@@ -5,6 +5,7 @@ import LoginPage from "./components/LoginPage";
 import SignUpPage from "./components/SignUpPage";
 import AllNotes from "./components/AllNotes";
 import Unauthorized from "./components/Unauthorized";
+import SingleNote from "./components/SingleNote";
 function App() {
   return (
     <Switch>
@@ -12,6 +13,7 @@ function App() {
       <Route path="/login" exact component={LoginPage}></Route>
       <Route path="/signup" exact component={SignUpPage}></Route>
       <Route path="/notes" exact component={AllNotes}></Route>
+      <Route path="/edit-note" exact component={SingleNote}></Route>
       <Route path="/unauthorized" exact component={Unauthorized}></Route>
     </Switch>
   );

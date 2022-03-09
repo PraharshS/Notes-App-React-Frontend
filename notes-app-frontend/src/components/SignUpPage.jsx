@@ -90,6 +90,7 @@ class SignupPage extends Component {
       return;
     }
     console.log("User => " + JSON.stringify(User));
+    document.querySelector(".popup").style.display = "block";
     this.setState({ alertMessage: "Account created Successfully" });
     this.changeAlertSuccess();
     setTimeout(() => {
@@ -126,7 +127,7 @@ class SignupPage extends Component {
                     <label style={containerStyle.label}>Password</label>
                     <input
                       style={containerStyle.input}
-                      type="text"
+                      type="password"
                       placeholder="Password"
                       className="form-control"
                       value={this.state.password}
@@ -137,7 +138,7 @@ class SignupPage extends Component {
                     <label style={containerStyle.label}>Confirm Password</label>
                     <input
                       style={containerStyle.input}
-                      type="text"
+                      type="password"
                       placeholder="Confirm Password"
                       className="form-control"
                       value={this.state.confirmPassword}
@@ -155,6 +156,7 @@ class SignupPage extends Component {
                     <div
                       className="btn btn-danger"
                       style={loginButtonStyle.button2}
+                      onClick={this.props.history.goBack}
                     >
                       Cancel
                     </div>
@@ -216,6 +218,7 @@ var loginButtonStyle = {
     justifyContent: "center",
   },
   button1: {
+    cursor: "pointer",
     marginTop: "1.5rem",
     padding: "1rem 2rem",
     marginRight: "1rem",
@@ -227,6 +230,7 @@ var loginButtonStyle = {
     width: "30%",
   },
   button2: {
+    cursor: "pointer",
     marginTop: "1.5rem",
     padding: "1rem 2rem",
     fontSize: "1.2rem",
