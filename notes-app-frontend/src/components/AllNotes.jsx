@@ -23,7 +23,7 @@ export default class AllNotes extends Component {
   }
   componentDidMount() {
     console.log("cdm called");
-
+    this.setState({ newNoteText: "" });
     document.querySelector("#popup").style.display = "none";
     // document.querySelector("#addBtn").style.display = "block";
     // document.querySelector("#updateBtn").style.display = "none";
@@ -46,9 +46,11 @@ export default class AllNotes extends Component {
   }
   addNote(e) {
     console.log(this.state.newNoteText);
+    document.querySelector("#noteInput").value = "";
     if (this.state.newNoteText.trim() === "") {
       console.log("empty");
       this.setState({ popupText: "Cannot add an empty note" });
+      this.setState({ newNoteText: "" });
       document.querySelector(".popup").style.display = "block";
       setTimeout(() => {
         document.querySelector(".popup").style.display = "none";
@@ -221,7 +223,6 @@ var notesTableStyle = {
     fontWeight: "bold",
     padding: "0.5rem 1rem",
     marginLeft: "auto",
-    marginRight: "1rem",
     height: "30px",
     marginTop: "auto",
     marginBottom: "auto",
