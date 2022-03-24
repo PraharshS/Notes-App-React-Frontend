@@ -22,6 +22,7 @@ export default class AllNotes extends Component {
     document.querySelector(".popup").style.display = "block";
   }
   componentDidMount() {
+    console.log(this.props.history.location.state);
     this.setState({ newNoteText: "" });
     document.querySelector("#popup").style.display = "none";
     // document.querySelector("#addBtn").style.display = "block";
@@ -34,7 +35,7 @@ export default class AllNotes extends Component {
     this.setState({ user: this.props.history.location.state.user });
     NoteService.getNotesByUser(this.props.history.location.state.user)
       .then((res) => {
-        this.setState({ notesList: res.data.notesData });
+        this.setState({ notesList: res.data });
       })
       .catch((err) => {
         this.serverErrorPopup("while fetching notes...");

@@ -41,7 +41,9 @@ class LoginPage extends Component {
 
     setTimeout(() => {
       UserService.loginUser(User).then((res) => {
-        if (res.data.user.id === 0) {
+        console.log(res.data);
+        var user = res.data;
+        if (user.id === 0) {
           document.querySelector(".popup").style.display = "block";
           this.setState({
             alertMessage: "Invalid credentials",
@@ -55,7 +57,7 @@ class LoginPage extends Component {
           this.setState({ isAlertShow: true });
           this.changeAlertSuccess();
           setTimeout(() => {
-            this.props.history.push("/notes", res.data);
+            this.props.history.push("/notes", { user: user });
           }, 3000);
         }
       });
