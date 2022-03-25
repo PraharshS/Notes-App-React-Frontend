@@ -8,10 +8,14 @@ export default class AllNotes extends Component {
     this.state = {
       notesList: [],
       newNoteText: "",
+      newNoteDescription: "",
       currentNoteId: "",
       popupText: "",
     };
     this.handleNewNoteText = this.handleNewNoteText.bind(this);
+    this.forceUpdate = this.forceUpdate.bind(this);
+    this.handleNewNoteDescription = this.handleNewNoteDescription.bind(this);
+    this.handleTaskToggle = this.handleTaskToggle.bind(this);
     this.addNote = this.addNote.bind(this);
     this.openFullNote = this.openFullNote.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
@@ -22,6 +26,7 @@ export default class AllNotes extends Component {
     document.querySelector(".popup").style.display = "block";
   }
   componentDidMount() {
+    console.log("did mount");
     console.log(this.props.history.location.state);
     this.setState({ newNoteText: "" });
     document.querySelector("#popup").style.display = "none";
@@ -35,6 +40,7 @@ export default class AllNotes extends Component {
     this.setState({ user: this.props.history.location.state.user });
     NoteService.getNotesByUser(this.props.history.location.state.user)
       .then((res) => {
+        console.log("notelist", ...res.data);
         this.setState({ notesList: res.data });
       })
       .catch((err) => {
@@ -44,8 +50,29 @@ export default class AllNotes extends Component {
   handleNewNoteText(e) {
     this.setState({ newNoteText: e.target.value });
   }
+  handleNewNoteDescription(e) {
+    this.setState({ newNoteDescription: e.target.value });
+  }
+  handleTaskToggle(e) {
+    var noteId = e.currentTarget.parentNode.getAttribute("id");
+    console.log("done called");
+    NoteService.toggleTaskDone(noteId)
+      .then((res) => {
+        NoteService.getNotesByUser(this.props.history.location.state.user)
+          .then((getRes) => {
+            console.log("notelist", ...getRes.data);
+            this.setState({ notesList: getRes.data });
+          })
+          .catch((err) => {
+            this.serverErrorPopup("while fetching notes...");
+          });
+      })
+      .catch((err) => {
+        this.serverErrorPopup("while changing task status");
+      });
+  }
   addNote(e) {
-    document.querySelector("#noteInput").value = "";
+    document.querySelector("#noteInputText").value = "";
     if (this.state.newNoteText.trim() === "") {
       this.setState({ popupText: "Cannot add an empty note" });
       this.setState({ newNoteText: "" });
@@ -55,9 +82,21 @@ export default class AllNotes extends Component {
       }, 2000);
       return;
     }
+    document.querySelector("#noteInputDescription").value = "";
+    if (this.state.newNoteDescription.trim() === "") {
+      this.setState({ popupText: "Cannot add note with empty description" });
+      this.setState({ newNoteDescription: "" });
+      document.querySelector(".popup").style.display = "block";
+      setTimeout(() => {
+        document.querySelector(".popup").style.display = "none";
+      }, 2000);
+      return;
+    }
     const noteObj = {
       message: this.state.newNoteText,
+      description: this.state.newNoteDescription,
       user: this.state.user,
+      isDone: false,
     };
 
     NoteService.addNote(noteObj)
@@ -77,7 +116,8 @@ export default class AllNotes extends Component {
     this.props.history.push("/edit-note", noteObj);
   }
   handleDeleteClick(e) {
-    var noteId = parseInt(e.currentTarget.getAttribute("id"));
+    var noteId = e.currentTarget.getAttribute("id");
+    console.log("deletedNoteId", noteId);
     NoteService.deleteNote(noteId)
       .then((res) => {
         this.setState({
@@ -112,11 +152,18 @@ export default class AllNotes extends Component {
 
         <div style={notesTableStyle.AddNote}>
           <input
-            id="noteInput"
+            id="noteInputText"
             style={notesTableStyle.input}
             type="text"
-            placeholder="Write a new note..."
+            placeholder="Write a new note message"
             onChange={this.handleNewNoteText}
+          />
+          <input
+            id="noteInputDescription"
+            style={notesTableStyle.input}
+            type="text"
+            placeholder="Write a new note description"
+            onChange={this.handleNewNoteDescription}
           />
           <button
             id="addBtn"
@@ -128,9 +175,46 @@ export default class AllNotes extends Component {
         </div>
         {this.state.notesList.map((note, noteSerialNumber) => {
           return (
-            <div key={note.id} style={notesTableStyle.note}>
+            <div id={note.id} key={note.id} style={notesTableStyle.note}>
               <p style={notesTableStyle.id}>{noteSerialNumber + 1}.</p>
-              <p>{note.message}</p>
+              <p
+                style={
+                  note.is_done
+                    ? notesTableStyle.CrossMessage
+                    : notesTableStyle.message
+                }
+              >
+                {note.message}
+              </p>
+              <p
+                style={
+                  note.is_done
+                    ? notesTableStyle.CrossDescription
+                    : notesTableStyle.description
+                }
+              >
+                {note.description}
+              </p>
+              <button
+                onClick={this.handleTaskToggle}
+                style={
+                  note.is_done
+                    ? notesTableStyle.DoneButtonHide
+                    : notesTableStyle.DoneButtonShow
+                }
+              >
+                Done
+              </button>
+              <button
+                onClick={this.handleTaskToggle}
+                style={
+                  note.is_done
+                    ? notesTableStyle.UndoButtonShow
+                    : notesTableStyle.UndoButtonHide
+                }
+              >
+                Undo
+              </button>
               <button
                 onClick={this.openFullNote}
                 id={note.id}
@@ -149,6 +233,7 @@ export default class AllNotes extends Component {
             </div>
           );
         })}
+
         <div className="popup" id="popup" style={notesTableStyle.popup}>
           <h2 style={notesTableStyle.popupText}>{this.state.popupText}</h2>
         </div>
@@ -165,12 +250,26 @@ var notesTableStyle = {
   card: {
     backgroundColor: "cyan",
     padding: "2rem",
-    width: "600px",
+    width: "800px",
   },
   h1: {
     display: "inline-block",
     textAlign: "center",
     fontSize: "3rem",
+  },
+  message: {
+    marginRight: "1rem",
+  },
+  CrossMessage: {
+    marginRight: "1rem",
+    textDecoration: "line-through",
+  },
+  description: {
+    color: "grey",
+  },
+  CrossDescription: {
+    color: "grey",
+    textDecoration: "line-through",
   },
   AddNote: {
     display: "flex",
@@ -209,6 +308,48 @@ var notesTableStyle = {
     fontWeight: "bold",
     padding: "1rem 1.5rem",
   },
+  DoneButtonShow: {
+    cursor: "pointer",
+    border: "2px solid black",
+    outline: "none",
+    borderRadius: "5px",
+    backgroundColor: "pink",
+    color: "black",
+    fontSize: "1rem",
+    fontWeight: "bold",
+    padding: "0.5rem 1rem",
+    marginLeft: "auto",
+    marginRight: "1rem",
+    height: "30px",
+    marginTop: "auto",
+    marginBottom: "auto",
+    display: "inline-flex",
+    alignItems: "center",
+  },
+  DoneButtonHide: {
+    display: "none",
+  },
+  UndoButtonShow: {
+    cursor: "pointer",
+    border: "2px solid black",
+    outline: "none",
+    borderRadius: "5px",
+    backgroundColor: "#c06cf0",
+    color: "black",
+    fontSize: "1rem",
+    fontWeight: "bold",
+    padding: "0.5rem 1rem",
+    marginLeft: "auto",
+    marginRight: "1rem",
+    height: "30px",
+    marginTop: "auto",
+    marginBottom: "auto",
+    display: "inline-flex",
+    alignItems: "center",
+  },
+  UndoButtonHide: {
+    display: "none",
+  },
   EditButton: {
     cursor: "pointer",
     border: "2px solid black",
@@ -219,7 +360,6 @@ var notesTableStyle = {
     fontSize: "1rem",
     fontWeight: "bold",
     padding: "0.5rem 1rem",
-    marginLeft: "auto",
     height: "30px",
     marginTop: "auto",
     marginBottom: "auto",
