@@ -9,12 +9,15 @@ export default class AllNotes extends Component {
       notesList: [],
       newNoteText: "",
       newNoteDescription: "",
+      newNoteTargetedDate: this.getDate(),
       currentNoteId: "",
       popupText: "",
     };
     this.handleNewNoteText = this.handleNewNoteText.bind(this);
     this.forceUpdate = this.forceUpdate.bind(this);
+    this.getDate = this.getDate.bind(this);
     this.handleNewNoteDescription = this.handleNewNoteDescription.bind(this);
+    this.handleNewNoteTargetedDate = this.handleNewNoteTargetedDate.bind(this);
     this.handleTaskToggle = this.handleTaskToggle.bind(this);
     this.addNote = this.addNote.bind(this);
     this.openFullNote = this.openFullNote.bind(this);
@@ -26,7 +29,6 @@ export default class AllNotes extends Component {
     document.querySelector(".popup").style.display = "block";
   }
   componentDidMount() {
-    console.log("did mount");
     console.log(this.props.history.location.state);
     this.setState({ newNoteText: "" });
     document.querySelector("#popup").style.display = "none";
@@ -40,18 +42,39 @@ export default class AllNotes extends Component {
     this.setState({ user: this.props.history.location.state.user });
     NoteService.getNotesByUser(this.props.history.location.state.user)
       .then((res) => {
-        console.log("notelist", ...res.data);
+        // console.log("notelist", ...res.data);
         this.setState({ notesList: res.data });
       })
       .catch((err) => {
         this.serverErrorPopup("while fetching notes...");
       });
   }
+  getDate() {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1;
+    var yyyy = today.getFullYear();
+
+    if (dd < 10) {
+      dd = "0" + dd;
+    }
+
+    if (mm < 10) {
+      mm = "0" + mm;
+    }
+
+    today = yyyy + "-" + mm + "-" + dd;
+    return today;
+  }
   handleNewNoteText(e) {
     this.setState({ newNoteText: e.target.value });
   }
   handleNewNoteDescription(e) {
     this.setState({ newNoteDescription: e.target.value });
+  }
+  handleNewNoteTargetedDate(e) {
+    console.log("picked date", e.target.value);
+    this.setState({ newNoteTargetedDate: e.target.value });
   }
   handleTaskToggle(e) {
     var noteId = e.currentTarget.parentNode.getAttribute("id");
@@ -96,9 +119,10 @@ export default class AllNotes extends Component {
       message: this.state.newNoteText,
       description: this.state.newNoteDescription,
       user: this.state.user,
-      isDone: false,
+      is_done: false,
+      targeted_date: this.state.newNoteTargetedDate,
     };
-
+    console.log("new Note obj", noteObj);
     NoteService.addNote(noteObj)
       .then((res) => {
         this.setState({ notesList: [...this.state.notesList, res.data] });
@@ -108,11 +132,17 @@ export default class AllNotes extends Component {
       });
   }
   openFullNote(e) {
-    var id = parseInt(e.currentTarget.getAttribute("id"));
-    this.setState({ currentNoteId: id });
+    var id = e.currentTarget.getAttribute("id");
     var message = e.currentTarget.getAttribute("message");
-    this.setState({ newNoteText: message });
-    var noteObj = { id, message, user: this.state.user };
+    var description = e.currentTarget.getAttribute("description");
+    var targeted_date = e.currentTarget.getAttribute("targeted_date");
+    var noteObj = {
+      id,
+      message,
+      description,
+      targeted_date,
+      user: this.state.user,
+    };
     this.props.history.push("/edit-note", noteObj);
   }
   handleDeleteClick(e) {
@@ -165,6 +195,14 @@ export default class AllNotes extends Component {
             placeholder="Write a new note description"
             onChange={this.handleNewNoteDescription}
           />
+          <input
+            id="noteInputTargetedDate"
+            style={notesTableStyle.inputDate}
+            type="date"
+            name="targeted_date"
+            value={this.state.newNoteTargetedDate}
+            onChange={this.handleNewNoteTargetedDate}
+          />
           <button
             id="addBtn"
             style={notesTableStyle.addBtn}
@@ -195,6 +233,15 @@ export default class AllNotes extends Component {
               >
                 {note.description}
               </p>
+              <p
+                style={
+                  note.is_done
+                    ? notesTableStyle.CrossDate
+                    : notesTableStyle.date
+                }
+              >
+                {note.targeted_date}
+              </p>
               <button
                 onClick={this.handleTaskToggle}
                 style={
@@ -219,6 +266,8 @@ export default class AllNotes extends Component {
                 onClick={this.openFullNote}
                 id={note.id}
                 message={note.message}
+                description={note.description}
+                targeted_date={note.targeted_date}
                 style={notesTableStyle.EditButton}
               >
                 Edit
@@ -250,7 +299,8 @@ var notesTableStyle = {
   card: {
     backgroundColor: "cyan",
     padding: "2rem",
-    width: "800px",
+    width: "1000px",
+    height: "80%",
   },
   h1: {
     display: "inline-block",
@@ -263,6 +313,7 @@ var notesTableStyle = {
   CrossMessage: {
     marginRight: "1rem",
     textDecoration: "line-through",
+    textDecorationThickness: "3px",
   },
   description: {
     color: "grey",
@@ -270,16 +321,34 @@ var notesTableStyle = {
   CrossDescription: {
     color: "grey",
     textDecoration: "line-through",
+    textDecorationThickness: "3px",
+  },
+  date: {
+    marginLeft: "1rem",
+    color: "grey",
+  },
+  CrossDate: {
+    marginLeft: "1rem",
+    color: "grey",
+    textDecoration: "line-through",
+    textDecorationThickness: "3px",
   },
   AddNote: {
     display: "flex",
     justifyContent: "center",
   },
   input: {
-    width: "600px",
+    width: "400px",
     padding: "1rem 1.5rem",
     fontSize: "1.2rem",
     marginRight: "1rem",
+    fontWeight: "bold",
+  },
+  inputDate: {
+    width: "250px",
+    marginRight: "1rem",
+    padding: "0.5rem",
+    fontSize: "1rem",
     fontWeight: "bold",
   },
   addBtn: {

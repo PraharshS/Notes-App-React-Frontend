@@ -6,11 +6,15 @@ export default class AllNotes extends Component {
     super(props);
     this.state = {
       noteMessage: this.props.history.location.state.message,
+      noteDescription: this.props.history.location.state.description,
+      noteTargetedDate: this.props.history.location.state.targeted_date,
       noteObj: this.props.history.location.state,
       alertMessage: "",
     };
-
+    console.log("note obj", this.props.history.location.state);
     this.changeMessage = this.changeMessage.bind(this);
+    this.changeDescription = this.changeDescription.bind(this);
+    this.changeTargetedDate = this.changeTargetedDate.bind(this);
     this.updateNote = this.updateNote.bind(this);
     this.changeAlertDanger = this.changeAlertDanger.bind(this);
     this.changeAlertSuccess = this.changeAlertSuccess.bind(this);
@@ -27,9 +31,17 @@ export default class AllNotes extends Component {
   changeMessage = (e) => {
     this.setState({ noteMessage: e.target.value });
   };
+  changeDescription = (e) => {
+    this.setState({ noteDescription: e.target.value });
+  };
+  changeTargetedDate = (e) => {
+    this.setState({ noteTargetedDate: e.target.value });
+  };
   updateNote = (e) => {
     const updatedNoteObj = {
       message: this.state.noteMessage,
+      description: this.state.noteDescription,
+      targeted_date: this.state.noteTargetedDate,
       user: this.state.noteObj.user,
     };
     NoteService.updateNote(this.state.noteObj.id, updatedNoteObj)
@@ -146,6 +158,28 @@ export default class AllNotes extends Component {
                     />
                   </div>
                   <div className="form-group" style={containerStyle.formGroup}>
+                    <label style={containerStyle.label}>description</label>
+                    <input
+                      style={containerStyle.input}
+                      type="text"
+                      placeholder="description"
+                      className="form-control"
+                      value={this.state.noteDescription}
+                      onChange={this.changeDescription}
+                    />
+                  </div>
+                  <div className="form-group" style={containerStyle.formGroup}>
+                    <label style={containerStyle.label}>targeted date</label>
+                    <input
+                      style={containerStyle.input}
+                      type="date"
+                      placeholder="description"
+                      className="form-control"
+                      value={this.state.noteTargetedDate}
+                      onChange={this.changeTargetedDate}
+                    />
+                  </div>
+                  <div className="form-group" style={containerStyle.formGroup}>
                     <div
                       className="btn btn-success"
                       onClick={this.updateNote}
@@ -202,6 +236,7 @@ var containerStyle = {
   input: {
     padding: "1rem 1rem",
     fontWeight: "bold",
+    width: "300px",
   },
   alertMessage: {
     backgroundColor: "orange",
