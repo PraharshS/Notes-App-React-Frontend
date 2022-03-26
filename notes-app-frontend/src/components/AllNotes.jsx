@@ -16,6 +16,7 @@ export default class AllNotes extends Component {
     this.handleNewNoteText = this.handleNewNoteText.bind(this);
     this.forceUpdate = this.forceUpdate.bind(this);
     this.getDate = this.getDate.bind(this);
+    this.isTargetDateValid = this.isTargetDateValid.bind(this);
     this.handleNewNoteDescription = this.handleNewNoteDescription.bind(this);
     this.handleNewNoteTargetedDate = this.handleNewNoteTargetedDate.bind(this);
     this.handleTaskToggle = this.handleTaskToggle.bind(this);
@@ -65,6 +66,12 @@ export default class AllNotes extends Component {
 
     today = yyyy + "-" + mm + "-" + dd;
     return today;
+  }
+  isTargetDateValid(noteTargetedDate) {
+    var today = this.getDate();
+    var date1Updated = new Date(noteTargetedDate.replace(/-/g, "/"));
+    var date2Updated = new Date(today.replace(/-/g, "/"));
+    return date1Updated > date2Updated;
   }
   handleNewNoteText(e) {
     this.setState({ newNoteText: e.target.value });
@@ -243,6 +250,16 @@ export default class AllNotes extends Component {
                 {note.targeted_date}
               </p>
               <button
+                disabled
+                style={
+                  this.isTargetDateValid(note.targeted_date)
+                    ? notesTableStyle.ExpiredButtonHide
+                    : notesTableStyle.ExpiredButtonShow
+                }
+              >
+                EXPIRED
+              </button>
+              <button
                 onClick={this.handleTaskToggle}
                 style={
                   note.is_done
@@ -376,6 +393,24 @@ var notesTableStyle = {
     fontSize: "1.2rem",
     fontWeight: "bold",
     padding: "1rem 1.5rem",
+  },
+  ExpiredButtonShow: {
+    border: "2px solid black",
+    outline: "none",
+    backgroundColor: "orange",
+    color: "black",
+    fontSize: "1.2rem",
+    padding: "0.5rem 1rem",
+    marginLeft: "auto",
+    marginRight: "1rem",
+    height: "30px",
+    marginTop: "auto",
+    marginBottom: "auto",
+    display: "inline-flex",
+    alignItems: "center",
+  },
+  ExpiredButtonHide: {
+    display: "none",
   },
   DoneButtonShow: {
     cursor: "pointer",
