@@ -5,7 +5,7 @@ export default class AllTasks extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      taskName: this.props.history.location.state.message,
+      taskName: this.props.history.location.state.name,
       taskDescription: this.props.history.location.state.description,
       taskTargetedDate: this.props.history.location.state.targeted_date,
       taskObj: this.props.history.location.state,
@@ -39,7 +39,7 @@ export default class AllTasks extends Component {
   };
   updateTask = (e) => {
     const updatedTaskObj = {
-      message: this.state.taskName,
+      name: this.state.taskName,
       description: this.state.taskDescription,
       targeted_date: this.state.taskTargetedDate,
       user: this.state.taskObj.user,
@@ -94,23 +94,23 @@ export default class AllTasks extends Component {
   openFullTask(e) {
     var id = parseInt(e.currentTarget.getAttribute("id"));
     this.setState({ currentTaskId: id });
-    var message = e.currentTarget.getAttribute("message");
-    this.setState({ newTaskText: message });
-    var taskObj = { id, message, user: this.state.user };
+    var name = e.currentTarget.getAttribute("name");
+    this.setState({ newTaskText: name });
+    var taskObj = { id, name, user: this.state.user };
     this.props.history.push("/view-task", taskObj);
   }
   handleUpdateClick(e) {
     const updatedTaskObj = {
-      message: this.state.newTaskText,
+      name: this.state.newTaskText,
       user: this.state.user,
     };
     TaskService.updateTask(this.state.currentTaskId, updatedTaskObj)
       .then((res) => {
-        TaskService.getTasksByUser(this.props.history.location.state.user).then(
-          (childRes) => {
-            this.setState({ tasksList: childRes.data.tasksData });
-          }
-        );
+        TaskService.getTasksByUser(
+          this.props.history.location.state.user.id
+        ).then((childRes) => {
+          this.setState({ tasksList: childRes.data.tasksData });
+        });
         document.querySelector("#addBtn").style.display = "block";
         document.querySelector("#updateBtn").style.display = "none";
         document.querySelector("#taskInput").value = "";
@@ -147,11 +147,11 @@ export default class AllTasks extends Component {
               <div className="card-body">
                 <form action="">
                   <div className="form-group" style={containerStyle.formGroup}>
-                    <label style={containerStyle.label}>message</label>
+                    <label style={containerStyle.label}>name</label>
                     <input
                       style={containerStyle.input}
                       type="text"
-                      placeholder="message"
+                      placeholder="name"
                       className="form-control"
                       value={this.state.taskName}
                       onChange={this.changeName}

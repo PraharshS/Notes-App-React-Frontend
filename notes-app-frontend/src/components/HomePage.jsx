@@ -26,7 +26,7 @@ var homePageStyle = {
     width: "600px",
     border: "6px solid black",
     padding: "2rem",
-    backgroundColor: "aqua",
+    backgroundColor: "#94d2bd",
   },
   heading: {
     fontSize: "3rem",
@@ -49,7 +49,7 @@ var homePageStyle = {
     border: "2px solid black",
     padding: "0.5rem 2rem",
     color: "black",
-    backgroundColor: "orange",
+    backgroundColor: "#fb8500",
   },
   loginBtn: {
     fontSize: "1.5rem",
@@ -57,6 +57,6 @@ var homePageStyle = {
     border: "2px solid black",
     padding: "0.5rem 2rem",
     color: "black",
-    backgroundColor: "lightgreen",
+    backgroundColor: "#8ecae6",
   },
 };

@@ -41,9 +41,9 @@ export default class AllTasks extends Component {
     }
     this.setState({ token: this.props.history.location.state.token });
     this.setState({ user: this.props.history.location.state.user });
-    TaskService.getTasksByUser(this.props.history.location.state.user)
+    TaskService.getTasksByUser(this.props.history.location.state.user.id)
       .then((res) => {
-        // console.log("tasklist", ...res.data);
+        console.log("tasklist", ...res.data);
         this.setState({ tasksList: res.data });
       })
       .catch((err) => {
@@ -88,7 +88,7 @@ export default class AllTasks extends Component {
     console.log("done called");
     TaskService.toggleTaskDone(taskId)
       .then((res) => {
-        TaskService.getTasksByUser(this.props.history.location.state.user)
+        TaskService.getTasksByUser(this.props.history.location.state.user.id)
           .then((getRes) => {
             console.log("tasklist", ...getRes.data);
             this.setState({ tasksList: getRes.data });
@@ -123,7 +123,7 @@ export default class AllTasks extends Component {
       return;
     }
     const taskObj = {
-      message: this.state.newTaskText,
+      name: this.state.newTaskText,
       description: this.state.newTaskDescription,
       user: this.state.user,
       is_done: false,
@@ -140,12 +140,12 @@ export default class AllTasks extends Component {
   }
   openFullTask(e) {
     var id = e.currentTarget.getAttribute("id");
-    var message = e.currentTarget.getAttribute("message");
+    var name = e.currentTarget.getAttribute("name");
     var description = e.currentTarget.getAttribute("description");
     var targeted_date = e.currentTarget.getAttribute("targeted_date");
     var taskObj = {
       id,
-      message,
+      name,
       description,
       targeted_date,
       user: this.state.user,
@@ -192,7 +192,7 @@ export default class AllTasks extends Component {
             id="taskInputText"
             style={tasksTableStyle.input}
             type="text"
-            placeholder="Write a new task message"
+            placeholder="Write a new task name"
             onChange={this.handleNewTaskText}
           />
           <input
@@ -227,10 +227,10 @@ export default class AllTasks extends Component {
                   style={
                     task.is_done
                       ? tasksTableStyle.CrossMessage
-                      : tasksTableStyle.message
+                      : tasksTableStyle.name
                   }
                 >
-                  Name : {task.message}
+                  Name : {task.name}
                 </p>
                 <p
                   style={
@@ -284,7 +284,7 @@ export default class AllTasks extends Component {
               <button
                 onClick={this.openFullTask}
                 id={task.id}
-                message={task.message}
+                name={task.name}
                 description={task.description}
                 targeted_date={task.targeted_date}
                 style={tasksTableStyle.EditButton}
@@ -316,7 +316,7 @@ var tasksTableStyle = {
     alignItems: "center",
   },
   card: {
-    backgroundColor: "cyan",
+    backgroundColor: "#94d2bd",
     padding: "2rem",
     width: "95%",
     maxWidth: "1000px",
@@ -329,7 +329,7 @@ var tasksTableStyle = {
   taskText: {
     width: "100%",
   },
-  message: {
+  name: {
     marginRight: "1rem",
   },
   CrossMessage: {
@@ -385,7 +385,7 @@ var tasksTableStyle = {
   },
   logoutBtn: {
     cursor: "pointer",
-    backgroundColor: "grey",
+    backgroundColor: "#dc2f02",
     color: "white",
     fontSize: "1.2rem",
     fontWeight: "bold",
@@ -424,11 +424,11 @@ var tasksTableStyle = {
     border: "2px solid black",
     outline: "none",
     borderRadius: "5px",
-    backgroundColor: "pink",
+    backgroundColor: "#219ebc",
     color: "black",
     fontSize: "1rem",
-    fontWeight: "bold",
-    padding: "0.5rem 1rem",
+    fontWeight: "normal",
+    padding: "1rem 1.5rem",
     marginLeft: "auto",
     marginRight: "1rem",
     height: "30px",
@@ -445,11 +445,11 @@ var tasksTableStyle = {
     border: "2px solid black",
     outline: "none",
     borderRadius: "5px",
-    backgroundColor: "#c06cf0",
+    backgroundColor: "#8ecae6",
     color: "black",
     fontSize: "1rem",
-    fontWeight: "bold",
-    padding: "0.5rem 1rem",
+    fontWeight: "normal",
+    padding: "1rem 1.5rem",
     marginLeft: "auto",
     marginRight: "1rem",
     height: "30px",
@@ -466,11 +466,11 @@ var tasksTableStyle = {
     border: "2px solid black",
     outline: "none",
     borderRadius: "5px",
-    backgroundColor: "yellow",
+    backgroundColor: "#ffb703",
     color: "black",
     fontSize: "1rem",
-    fontWeight: "bold",
-    padding: "0.5rem 1rem",
+    fontWeight: "normal",
+    padding: "1rem 1.5rem",
     height: "30px",
     marginTop: "auto",
     marginBottom: "auto",
@@ -482,11 +482,11 @@ var tasksTableStyle = {
     border: "2px solid black",
     outline: "none",
     borderRadius: "5px",
-    backgroundColor: "#ff4336",
+    backgroundColor: "#fb8500",
     color: "black",
     fontSize: "1rem",
-    fontWeight: "bold",
-    padding: "0.5rem 1rem",
+    fontWeight: "normal",
+    padding: "1rem 1.5rem",
     marginLeft: "1rem",
     marginRight: "1rem",
     height: "30px",

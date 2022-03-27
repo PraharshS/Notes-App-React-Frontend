@@ -30,7 +30,7 @@ var tasksTableStyle = {
     alignItems: "center",
   },
   card: {
-    backgroundColor: "cyan",
+    backgroundColor: "#94d2bd",
     padding: "2rem",
   },
   h1: {

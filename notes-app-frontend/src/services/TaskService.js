@@ -3,8 +3,8 @@ import axios from "axios";
 // const NOTE_API_BASE_URL = "http://localhost:5000/node-api";
 const NOTE_API_BASE_URL = "http://localhost:8000/go-api";
 class NoteService {
-  getTasksByUser(user) {
-    return axios.post(NOTE_API_BASE_URL + "/tasksByUser", user);
+  getTasksByUser(userID) {
+    return axios.get(NOTE_API_BASE_URL + "/tasksByUser/" + userID);
   }
   addTask(taskObj) {
     return axios.post(NOTE_API_BASE_URL + "/task", taskObj);
