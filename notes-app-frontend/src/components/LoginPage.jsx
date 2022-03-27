@@ -52,12 +52,12 @@ class LoginPage extends Component {
         } else {
           document.querySelector(".popup").style.display = "block";
           this.setState({
-            alertMessage: "Login Successful, redirecting to your notes",
+            alertMessage: "Login Successful, redirecting to your tasks",
           });
           this.setState({ isAlertShow: true });
           this.changeAlertSuccess();
           setTimeout(() => {
-            this.props.history.push("/notes", { user: user });
+            this.props.history.push("/tasks", { user: user });
           }, 3000);
         }
       });

@@ -1,24 +1,24 @@
 import React, { Component } from "react";
-import NoteService from "../services/NoteService";
+import TaskService from "../services/TaskService";
 
-export default class AllNotes extends Component {
+export default class AllTasks extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      noteMessage: this.props.history.location.state.message,
-      noteDescription: this.props.history.location.state.description,
-      noteTargetedDate: this.props.history.location.state.targeted_date,
-      noteObj: this.props.history.location.state,
+      taskName: this.props.history.location.state.message,
+      taskDescription: this.props.history.location.state.description,
+      taskTargetedDate: this.props.history.location.state.targeted_date,
+      taskObj: this.props.history.location.state,
       alertMessage: "",
     };
-    console.log("note obj", this.props.history.location.state);
-    this.changeMessage = this.changeMessage.bind(this);
+    console.log("task obj", this.props.history.location.state);
+    this.changeName = this.changeName.bind(this);
     this.changeDescription = this.changeDescription.bind(this);
     this.changeTargetedDate = this.changeTargetedDate.bind(this);
-    this.updateNote = this.updateNote.bind(this);
+    this.updateTask = this.updateTask.bind(this);
     this.changeAlertDanger = this.changeAlertDanger.bind(this);
     this.changeAlertSuccess = this.changeAlertSuccess.bind(this);
-    this.cancelEditNote = this.cancelEditNote.bind(this);
+    this.cancelEditTask = this.cancelEditTask.bind(this);
   }
   changeAlertDanger = (e) => {
     document.querySelector(".popup").style.display = "block";
@@ -28,26 +28,26 @@ export default class AllNotes extends Component {
     document.querySelector(".popup").style.display = "block";
     document.querySelector(".popup").style.backgroundColor = "green";
   };
-  changeMessage = (e) => {
-    this.setState({ noteMessage: e.target.value });
+  changeName = (e) => {
+    this.setState({ taskName: e.target.value });
   };
   changeDescription = (e) => {
-    this.setState({ noteDescription: e.target.value });
+    this.setState({ taskDescription: e.target.value });
   };
   changeTargetedDate = (e) => {
-    this.setState({ noteTargetedDate: e.target.value });
+    this.setState({ taskTargetedDate: e.target.value });
   };
-  updateNote = (e) => {
-    const updatedNoteObj = {
-      message: this.state.noteMessage,
-      description: this.state.noteDescription,
-      targeted_date: this.state.noteTargetedDate,
-      user: this.state.noteObj.user,
+  updateTask = (e) => {
+    const updatedTaskObj = {
+      message: this.state.taskName,
+      description: this.state.taskDescription,
+      targeted_date: this.state.taskTargetedDate,
+      user: this.state.taskObj.user,
     };
-    NoteService.updateNote(this.state.noteObj.id, updatedNoteObj)
+    TaskService.updateTask(this.state.taskObj.id, updatedTaskObj)
       .then((res) => {
         this.setState({
-          alertMessage: "Note updated Successfully, Redirecting to All notes",
+          alertMessage: "Task updated Successfully, Redirecting to All tasks",
         });
         this.changeAlertSuccess();
         setTimeout(() => {
@@ -55,12 +55,12 @@ export default class AllNotes extends Component {
         }, 2000);
       })
       .catch((err) => {
-        this.serverErrorPopup("while updating the note...");
+        this.serverErrorPopup("while updating the task...");
       });
   };
-  cancelEditNote = (e) => {
+  cancelEditTask = (e) => {
     this.setState({
-      alertMessage: "Note Updation cancelled, Redirecting to All notes",
+      alertMessage: "Task Updation cancelled, Redirecting to All tasks",
     });
     this.changeAlertDanger();
     setTimeout(() => {
@@ -79,56 +79,56 @@ export default class AllNotes extends Component {
     }
     this.setState({ token: this.props.history.location.state.token });
     this.setState({ user: this.props.history.location.state.user });
-    NoteService.getNotesByUser(this.props.history.location.state.user)
+    TaskService.getTasksByUser(this.props.history.location.state.user)
       .then((res) => {
-        this.setState({ notesList: res.data.notesData });
+        this.setState({ tasksList: res.data.tasksData });
       })
       .catch((err) => {
-        this.serverErrorPopup("while fetching notes...");
+        this.serverErrorPopup("while fetching tasks...");
       });
   }
-  handleNewNoteText(e) {
-    this.setState({ newNoteText: e.target.value });
+  handleNewTaskText(e) {
+    this.setState({ newTaskText: e.target.value });
   }
 
-  openFullNote(e) {
+  openFullTask(e) {
     var id = parseInt(e.currentTarget.getAttribute("id"));
-    this.setState({ currentNoteId: id });
+    this.setState({ currentTaskId: id });
     var message = e.currentTarget.getAttribute("message");
-    this.setState({ newNoteText: message });
-    var noteObj = { id, message, user: this.state.user };
-    this.props.history.push("/view-note", noteObj);
+    this.setState({ newTaskText: message });
+    var taskObj = { id, message, user: this.state.user };
+    this.props.history.push("/view-task", taskObj);
   }
   handleUpdateClick(e) {
-    const updatedNoteObj = {
-      message: this.state.newNoteText,
+    const updatedTaskObj = {
+      message: this.state.newTaskText,
       user: this.state.user,
     };
-    NoteService.updateNote(this.state.currentNoteId, updatedNoteObj)
+    TaskService.updateTask(this.state.currentTaskId, updatedTaskObj)
       .then((res) => {
-        NoteService.getNotesByUser(this.props.history.location.state.user).then(
+        TaskService.getTasksByUser(this.props.history.location.state.user).then(
           (childRes) => {
-            this.setState({ notesList: childRes.data.notesData });
+            this.setState({ tasksList: childRes.data.tasksData });
           }
         );
         document.querySelector("#addBtn").style.display = "block";
         document.querySelector("#updateBtn").style.display = "none";
-        document.querySelector("#noteInput").value = "";
+        document.querySelector("#taskInput").value = "";
       })
       .catch((err) => {
-        this.serverErrorPopup("while updating the note...");
+        this.serverErrorPopup("while updating the task...");
       });
   }
   handleDeleteClick(e) {
-    var noteId = parseInt(e.currentTarget.getAttribute("id"));
-    NoteService.deleteNote(noteId)
+    var taskId = parseInt(e.currentTarget.getAttribute("id"));
+    TaskService.deleteTask(taskId)
       .then((res) => {
         this.setState({
-          notesList: this.state.notesList.filter((note) => note.id !== noteId),
+          tasksList: this.state.tasksList.filter((task) => task.id !== taskId),
         });
       })
       .catch((err) => {
-        this.serverErrorPopup("while deleting the note...");
+        this.serverErrorPopup("while deleting the task...");
       });
   }
   handleLogOutClick(e) {
@@ -142,7 +142,7 @@ export default class AllNotes extends Component {
           <div className="row">
             <div className="card" style={containerStyle.card}>
               <h3 className="text-center" style={containerStyle.heading}>
-                Update Note
+                Update Task
               </h3>
               <div className="card-body">
                 <form action="">
@@ -153,8 +153,8 @@ export default class AllNotes extends Component {
                       type="text"
                       placeholder="message"
                       className="form-control"
-                      value={this.state.noteMessage}
-                      onChange={this.changeMessage}
+                      value={this.state.taskName}
+                      onChange={this.changeName}
                     />
                   </div>
                   <div className="form-group" style={containerStyle.formGroup}>
@@ -164,7 +164,7 @@ export default class AllNotes extends Component {
                       type="text"
                       placeholder="description"
                       className="form-control"
-                      value={this.state.noteDescription}
+                      value={this.state.taskDescription}
                       onChange={this.changeDescription}
                     />
                   </div>
@@ -175,21 +175,21 @@ export default class AllNotes extends Component {
                       type="date"
                       placeholder="description"
                       className="form-control"
-                      value={this.state.noteTargetedDate}
+                      value={this.state.taskTargetedDate}
                       onChange={this.changeTargetedDate}
                     />
                   </div>
                   <div className="form-group" style={containerStyle.formGroup}>
                     <div
                       className="btn btn-success"
-                      onClick={this.updateNote}
+                      onClick={this.updateTask}
                       style={loginButtonStyle.button1}
                     >
                       Update
                     </div>
                     <div
                       className="btn btn-danger"
-                      onClick={this.cancelEditNote}
+                      onClick={this.cancelEditTask}
                       style={loginButtonStyle.button2}
                     >
                       Cancel

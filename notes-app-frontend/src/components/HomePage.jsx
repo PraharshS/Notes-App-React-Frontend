@@ -4,7 +4,7 @@ export default class HomePage extends Component {
   render() {
     return (
       <div style={homePageStyle.div}>
-        <h1 style={homePageStyle.heading}>Welcome To Notes App</h1>
+        <h1 style={homePageStyle.heading}>Welcome To Tasks App</h1>
         <div style={homePageStyle.buttons}>
           <Link to="/login" style={homePageStyle.link}>
             <div className="Login" style={homePageStyle.loginBtn}>

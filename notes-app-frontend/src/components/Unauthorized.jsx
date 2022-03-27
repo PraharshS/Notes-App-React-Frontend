@@ -10,12 +10,12 @@ export default class Unauthorized extends Component {
   }
   render() {
     return (
-      <div style={notesTableStyle.card}>
-        <div style={notesTableStyle.header}>
-          <h1 style={notesTableStyle.h1}>Unauthorized Access</h1>
+      <div style={tasksTableStyle.card}>
+        <div style={tasksTableStyle.header}>
+          <h1 style={tasksTableStyle.h1}>Unauthorized Access</h1>
         </div>
-        <div style={notesTableStyle.btnWrapper}>
-          <button style={notesTableStyle.btn} onClick={this.handleHomeClick}>
+        <div style={tasksTableStyle.btnWrapper}>
+          <button style={tasksTableStyle.btn} onClick={this.handleHomeClick}>
             GO TO HOME PAGE
           </button>
         </div>
@@ -23,7 +23,7 @@ export default class Unauthorized extends Component {
     );
   }
 }
-var notesTableStyle = {
+var tasksTableStyle = {
   header: {
     display: "flex",
     justifyContent: "space-between",

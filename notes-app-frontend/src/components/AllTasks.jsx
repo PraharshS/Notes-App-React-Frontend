@@ -1,27 +1,27 @@
 import React, { Component } from "react";
-import NoteService from "../services/NoteService";
+import TaskService from "../services/TaskService";
 
-export default class AllNotes extends Component {
+export default class AllTasks extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      notesList: [],
-      newNoteText: "",
-      newNoteDescription: "",
-      newNoteTargetedDate: this.getDate(),
-      currentNoteId: "",
+      tasksList: [],
+      newTaskText: "",
+      newTaskDescription: "",
+      newTaskTargetedDate: this.getDate(),
+      currentTaskId: "",
       popupText: "",
     };
-    this.handleNewNoteText = this.handleNewNoteText.bind(this);
+    this.handleNewTaskText = this.handleNewTaskText.bind(this);
     this.forceUpdate = this.forceUpdate.bind(this);
     this.getDate = this.getDate.bind(this);
     this.isTargetDateValid = this.isTargetDateValid.bind(this);
-    this.handleNewNoteDescription = this.handleNewNoteDescription.bind(this);
-    this.handleNewNoteTargetedDate = this.handleNewNoteTargetedDate.bind(this);
+    this.handleNewTaskDescription = this.handleNewTaskDescription.bind(this);
+    this.handleNewTaskTargetedDate = this.handleNewTaskTargetedDate.bind(this);
     this.handleTaskToggle = this.handleTaskToggle.bind(this);
-    this.addNote = this.addNote.bind(this);
-    this.openFullNote = this.openFullNote.bind(this);
+    this.addTask = this.addTask.bind(this);
+    this.openFullTask = this.openFullTask.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
     this.handleLogOutClick = this.handleLogOutClick.bind(this);
   }
@@ -31,7 +31,7 @@ export default class AllNotes extends Component {
   }
   componentDidMount() {
     console.log(this.props.history.location.state);
-    this.setState({ newNoteText: "" });
+    this.setState({ newTaskText: "" });
     document.querySelector("#popup").style.display = "none";
     // document.querySelector("#addBtn").style.display = "block";
     // document.querySelector("#updateBtn").style.display = "none";
@@ -41,13 +41,13 @@ export default class AllNotes extends Component {
     }
     this.setState({ token: this.props.history.location.state.token });
     this.setState({ user: this.props.history.location.state.user });
-    NoteService.getNotesByUser(this.props.history.location.state.user)
+    TaskService.getTasksByUser(this.props.history.location.state.user)
       .then((res) => {
-        // console.log("notelist", ...res.data);
-        this.setState({ notesList: res.data });
+        // console.log("tasklist", ...res.data);
+        this.setState({ tasksList: res.data });
       })
       .catch((err) => {
-        this.serverErrorPopup("while fetching notes...");
+        this.serverErrorPopup("while fetching tasks...");
       });
   }
   getDate() {
@@ -67,102 +67,102 @@ export default class AllNotes extends Component {
     today = yyyy + "-" + mm + "-" + dd;
     return today;
   }
-  isTargetDateValid(noteTargetedDate) {
+  isTargetDateValid(taskTargetedDate) {
     var today = this.getDate();
-    var date1Updated = new Date(noteTargetedDate.replace(/-/g, "/"));
+    var date1Updated = new Date(taskTargetedDate.replace(/-/g, "/"));
     var date2Updated = new Date(today.replace(/-/g, "/"));
-    return date1Updated > date2Updated;
+    return date1Updated >= date2Updated;
   }
-  handleNewNoteText(e) {
-    this.setState({ newNoteText: e.target.value });
+  handleNewTaskText(e) {
+    this.setState({ newTaskText: e.target.value });
   }
-  handleNewNoteDescription(e) {
-    this.setState({ newNoteDescription: e.target.value });
+  handleNewTaskDescription(e) {
+    this.setState({ newTaskDescription: e.target.value });
   }
-  handleNewNoteTargetedDate(e) {
+  handleNewTaskTargetedDate(e) {
     console.log("picked date", e.target.value);
-    this.setState({ newNoteTargetedDate: e.target.value });
+    this.setState({ newTaskTargetedDate: e.target.value });
   }
   handleTaskToggle(e) {
-    var noteId = e.currentTarget.parentNode.getAttribute("id");
+    var taskId = e.currentTarget.parentNode.getAttribute("id");
     console.log("done called");
-    NoteService.toggleTaskDone(noteId)
+    TaskService.toggleTaskDone(taskId)
       .then((res) => {
-        NoteService.getNotesByUser(this.props.history.location.state.user)
+        TaskService.getTasksByUser(this.props.history.location.state.user)
           .then((getRes) => {
-            console.log("notelist", ...getRes.data);
-            this.setState({ notesList: getRes.data });
+            console.log("tasklist", ...getRes.data);
+            this.setState({ tasksList: getRes.data });
           })
           .catch((err) => {
-            this.serverErrorPopup("while fetching notes...");
+            this.serverErrorPopup("while fetching tasks...");
           });
       })
       .catch((err) => {
         this.serverErrorPopup("while changing task status");
       });
   }
-  addNote(e) {
-    document.querySelector("#noteInputText").value = "";
-    if (this.state.newNoteText.trim() === "") {
-      this.setState({ popupText: "Cannot add an empty note" });
-      this.setState({ newNoteText: "" });
+  addTask(e) {
+    document.querySelector("#taskInputText").value = "";
+    if (this.state.newTaskText.trim() === "") {
+      this.setState({ popupText: "Cannot add an empty task" });
+      this.setState({ newTaskText: "" });
       document.querySelector(".popup").style.display = "block";
       setTimeout(() => {
         document.querySelector(".popup").style.display = "none";
       }, 2000);
       return;
     }
-    document.querySelector("#noteInputDescription").value = "";
-    if (this.state.newNoteDescription.trim() === "") {
-      this.setState({ popupText: "Cannot add note with empty description" });
-      this.setState({ newNoteDescription: "" });
+    document.querySelector("#taskInputDescription").value = "";
+    if (this.state.newTaskDescription.trim() === "") {
+      this.setState({ popupText: "Cannot add task with empty description" });
+      this.setState({ newTaskDescription: "" });
       document.querySelector(".popup").style.display = "block";
       setTimeout(() => {
         document.querySelector(".popup").style.display = "none";
       }, 2000);
       return;
     }
-    const noteObj = {
-      message: this.state.newNoteText,
-      description: this.state.newNoteDescription,
+    const taskObj = {
+      message: this.state.newTaskText,
+      description: this.state.newTaskDescription,
       user: this.state.user,
       is_done: false,
-      targeted_date: this.state.newNoteTargetedDate,
+      targeted_date: this.state.newTaskTargetedDate,
     };
-    console.log("new Note obj", noteObj);
-    NoteService.addNote(noteObj)
+    console.log("new Task obj", taskObj);
+    TaskService.addTask(taskObj)
       .then((res) => {
-        this.setState({ notesList: [...this.state.notesList, res.data] });
+        this.setState({ tasksList: [...this.state.tasksList, res.data] });
       })
       .catch((err) => {
-        this.serverErrorPopup("while adding a note...");
+        this.serverErrorPopup("while adding a task...");
       });
   }
-  openFullNote(e) {
+  openFullTask(e) {
     var id = e.currentTarget.getAttribute("id");
     var message = e.currentTarget.getAttribute("message");
     var description = e.currentTarget.getAttribute("description");
     var targeted_date = e.currentTarget.getAttribute("targeted_date");
-    var noteObj = {
+    var taskObj = {
       id,
       message,
       description,
       targeted_date,
       user: this.state.user,
     };
-    this.props.history.push("/edit-note", noteObj);
+    this.props.history.push("/edit-task", taskObj);
   }
   handleDeleteClick(e) {
-    var noteId = e.currentTarget.getAttribute("id");
-    console.log("deletedNoteId", noteId);
-    NoteService.deleteNote(noteId)
+    var taskId = e.currentTarget.getAttribute("id");
+    console.log("deletedTaskId", taskId);
+    TaskService.deleteTask(taskId)
       .then((res) => {
         this.setState({
-          notesList: this.state.notesList.filter((note) => note.id !== noteId),
+          tasksList: this.state.tasksList.filter((task) => task.id !== taskId),
         });
       })
       .catch((err) => {
-        this.serverErrorPopup("while deleting the note...");
+        this.serverErrorPopup("while deleting the task...");
       });
   }
   handleLogOutClick(e) {
@@ -171,90 +171,92 @@ export default class AllNotes extends Component {
   }
   render() {
     return (
-      <div style={notesTableStyle.card}>
-        <div style={notesTableStyle.header}>
-          <h1 style={notesTableStyle.h1}>
+      <div style={tasksTableStyle.card}>
+        <div style={tasksTableStyle.header}>
+          <h1 style={tasksTableStyle.h1}>
             {this.props.history.location.state &&
               this.props.history.location.state.user.username}
-            's Notes
+            's Tasks
           </h1>
           <button
             id="logoutBtn"
-            style={notesTableStyle.logoutBtn}
+            style={tasksTableStyle.logoutBtn}
             onClick={this.handleLogOutClick}
           >
             Logout
           </button>
         </div>
 
-        <div style={notesTableStyle.AddNote}>
+        <div style={tasksTableStyle.AddTask}>
           <input
-            id="noteInputText"
-            style={notesTableStyle.input}
+            id="taskInputText"
+            style={tasksTableStyle.input}
             type="text"
-            placeholder="Write a new note message"
-            onChange={this.handleNewNoteText}
+            placeholder="Write a new task message"
+            onChange={this.handleNewTaskText}
           />
           <input
-            id="noteInputDescription"
-            style={notesTableStyle.input}
+            id="taskInputDescription"
+            style={tasksTableStyle.input}
             type="text"
-            placeholder="Write a new note description"
-            onChange={this.handleNewNoteDescription}
+            placeholder="Write a new task description"
+            onChange={this.handleNewTaskDescription}
           />
           <input
-            id="noteInputTargetedDate"
-            style={notesTableStyle.inputDate}
+            id="taskInputTargetedDate"
+            style={tasksTableStyle.inputDate}
             type="date"
             name="targeted_date"
-            value={this.state.newNoteTargetedDate}
-            onChange={this.handleNewNoteTargetedDate}
+            value={this.state.newTaskTargetedDate}
+            onChange={this.handleNewTaskTargetedDate}
           />
           <button
             id="addBtn"
-            style={notesTableStyle.addBtn}
-            onClick={this.addNote}
+            style={tasksTableStyle.addBtn}
+            onClick={this.addTask}
           >
             Add
           </button>
         </div>
-        {this.state.notesList.map((note, noteSerialNumber) => {
+        {this.state.tasksList.map((task, taskSerialNumber) => {
           return (
-            <div id={note.id} key={note.id} style={notesTableStyle.note}>
-              <p style={notesTableStyle.id}>{noteSerialNumber + 1}.</p>
-              <p
-                style={
-                  note.is_done
-                    ? notesTableStyle.CrossMessage
-                    : notesTableStyle.message
-                }
-              >
-                {note.message}
-              </p>
-              <p
-                style={
-                  note.is_done
-                    ? notesTableStyle.CrossDescription
-                    : notesTableStyle.description
-                }
-              >
-                {note.description}
-              </p>
-              <p
-                style={
-                  note.is_done
-                    ? notesTableStyle.CrossDate
-                    : notesTableStyle.date
-                }
-              >
-                {note.targeted_date}
-              </p>
+            <div id={task.id} key={task.id} style={tasksTableStyle.task}>
+              <p style={tasksTableStyle.id}>{taskSerialNumber + 1}.</p>
+              <div style={tasksTableStyle.taskText}>
+                <p
+                  style={
+                    task.is_done
+                      ? tasksTableStyle.CrossMessage
+                      : tasksTableStyle.message
+                  }
+                >
+                  Name : {task.message}
+                </p>
+                <p
+                  style={
+                    task.is_done
+                      ? tasksTableStyle.CrossDescription
+                      : tasksTableStyle.description
+                  }
+                >
+                  Description : {task.description}
+                </p>
+                <p
+                  style={
+                    task.is_done
+                      ? tasksTableStyle.CrossDate
+                      : tasksTableStyle.date
+                  }
+                >
+                  Targeted Date : {task.targeted_date}
+                </p>
+              </div>
               <button
                 disabled
                 style={
-                  this.isTargetDateValid(note.targeted_date)
-                    ? notesTableStyle.ExpiredButtonHide
-                    : notesTableStyle.ExpiredButtonShow
+                  this.isTargetDateValid(task.targeted_date)
+                    ? tasksTableStyle.ExpiredButtonHide
+                    : tasksTableStyle.ExpiredButtonShow
                 }
               >
                 EXPIRED
@@ -262,9 +264,9 @@ export default class AllNotes extends Component {
               <button
                 onClick={this.handleTaskToggle}
                 style={
-                  note.is_done
-                    ? notesTableStyle.DoneButtonHide
-                    : notesTableStyle.DoneButtonShow
+                  task.is_done
+                    ? tasksTableStyle.DoneButtonHide
+                    : tasksTableStyle.DoneButtonShow
                 }
               >
                 Done
@@ -272,27 +274,27 @@ export default class AllNotes extends Component {
               <button
                 onClick={this.handleTaskToggle}
                 style={
-                  note.is_done
-                    ? notesTableStyle.UndoButtonShow
-                    : notesTableStyle.UndoButtonHide
+                  task.is_done
+                    ? tasksTableStyle.UndoButtonShow
+                    : tasksTableStyle.UndoButtonHide
                 }
               >
                 Undo
               </button>
               <button
-                onClick={this.openFullNote}
-                id={note.id}
-                message={note.message}
-                description={note.description}
-                targeted_date={note.targeted_date}
-                style={notesTableStyle.EditButton}
+                onClick={this.openFullTask}
+                id={task.id}
+                message={task.message}
+                description={task.description}
+                targeted_date={task.targeted_date}
+                style={tasksTableStyle.EditButton}
               >
                 Edit
               </button>
               <button
                 onClick={this.handleDeleteClick}
-                id={note.id}
-                style={notesTableStyle.DeleteButton}
+                id={task.id}
+                style={tasksTableStyle.DeleteButton}
               >
                 Delete
               </button>
@@ -300,14 +302,14 @@ export default class AllNotes extends Component {
           );
         })}
 
-        <div className="popup" id="popup" style={notesTableStyle.popup}>
-          <h2 style={notesTableStyle.popupText}>{this.state.popupText}</h2>
+        <div className="popup" id="popup" style={tasksTableStyle.popup}>
+          <h2 style={tasksTableStyle.popupText}>{this.state.popupText}</h2>
         </div>
       </div>
     );
   }
 }
-var notesTableStyle = {
+var tasksTableStyle = {
   header: {
     display: "flex",
     justifyContent: "space-between",
@@ -316,13 +318,16 @@ var notesTableStyle = {
   card: {
     backgroundColor: "cyan",
     padding: "2rem",
-    width: "1000px",
-    height: "80%",
+    width: "95%",
+    maxWidth: "1000px",
   },
   h1: {
     display: "inline-block",
     textAlign: "center",
     fontSize: "3rem",
+  },
+  taskText: {
+    width: "100%",
   },
   message: {
     marginRight: "1rem",
@@ -333,24 +338,26 @@ var notesTableStyle = {
     textDecorationThickness: "3px",
   },
   description: {
-    color: "grey",
+    // color: "grey",
+    fontWeight: "normal",
   },
   CrossDescription: {
-    color: "grey",
+    // color: "grey",
+    fontWeight: "normal",
     textDecoration: "line-through",
     textDecorationThickness: "3px",
   },
   date: {
-    marginLeft: "1rem",
-    color: "grey",
+    // color: "grey",
+    fontWeight: "normal",
   },
   CrossDate: {
-    marginLeft: "1rem",
-    color: "grey",
+    // color: "grey",
+    fontWeight: "normal",
     textDecoration: "line-through",
     textDecorationThickness: "3px",
   },
-  AddNote: {
+  AddTask: {
     display: "flex",
     justifyContent: "center",
   },
@@ -488,7 +495,7 @@ var notesTableStyle = {
     display: "inline-flex",
     alignItems: "center",
   },
-  note: {
+  task: {
     backgroundColor: "white",
     display: "flex",
     margin: "1rem 0",
