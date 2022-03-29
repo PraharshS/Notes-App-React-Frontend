@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import TaskService from "../services/TaskService";
 
-export default class AllTasks extends Component {
+export default class SingleTask extends Component {
   constructor(props) {
     super(props);
+    console.log("props", this.props.history.location);
     this.state = {
       taskName: this.props.history.location.state.name,
       taskDescription: this.props.history.location.state.description,
@@ -11,7 +12,6 @@ export default class AllTasks extends Component {
       taskObj: this.props.history.location.state,
       alertMessage: "",
     };
-    console.log("task obj", this.props.history.location.state);
     this.changeName = this.changeName.bind(this);
     this.changeDescription = this.changeDescription.bind(this);
     this.changeTargetedDate = this.changeTargetedDate.bind(this);
@@ -79,7 +79,7 @@ export default class AllTasks extends Component {
     }
     this.setState({ token: this.props.history.location.state.token });
     this.setState({ user: this.props.history.location.state.user });
-    TaskService.getTasksByUser(this.props.history.location.state.user)
+    TaskService.getTasksByUser(this.props.history.location.state.user.id)
       .then((res) => {
         this.setState({ tasksList: res.data.tasksData });
       })

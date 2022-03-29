@@ -41,8 +41,9 @@ class LoginPage extends Component {
 
     setTimeout(() => {
       UserService.loginUser(User).then((res) => {
-        console.log(res.data);
-        var user = res.data;
+        console.log("data", res.data);
+        var user = res.data.user;
+        var token = res.data.token;
         if (user.id === 0) {
           document.querySelector(".popup").style.display = "block";
           this.setState({
@@ -57,7 +58,7 @@ class LoginPage extends Component {
           this.setState({ isAlertShow: true });
           this.changeAlertSuccess();
           setTimeout(() => {
-            this.props.history.push("/tasks", { user: user });
+            this.props.history.push("/tasks", { user: user, token: token });
           }, 3000);
         }
       });

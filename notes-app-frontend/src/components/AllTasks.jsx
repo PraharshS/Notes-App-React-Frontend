@@ -35,7 +35,11 @@ export default class AllTasks extends Component {
     document.querySelector("#popup").style.display = "none";
     // document.querySelector("#addBtn").style.display = "block";
     // document.querySelector("#updateBtn").style.display = "none";
-    if (typeof this.props.history.location.state === "undefined") {
+    console.log("sent by go after login ", this.props.history.location.state);
+    if (
+      typeof this.props.history.location.state === "undefined" ||
+      typeof this.props.history.location.state.token === "undefined"
+    ) {
       this.props.history.push("/unauthorized");
       return;
     }
@@ -150,6 +154,7 @@ export default class AllTasks extends Component {
       targeted_date,
       user: this.state.user,
     };
+    console.log("taskObj", taskObj);
     this.props.history.push("/edit-task", taskObj);
   }
   handleDeleteClick(e) {
