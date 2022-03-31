@@ -16,7 +16,7 @@ class NoteService {
     return axios.delete(NOTE_API_BASE_URL + "/task/" + taskId);
   }
   toggleTaskDone(taskId) {
-    return axios.put(NOTE_API_BASE_URL + "/task/" + taskId);
+    return axios.post(NOTE_API_BASE_URL + "/task/" + taskId);
   }
 }
 export default new NoteService();
